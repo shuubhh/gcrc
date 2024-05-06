@@ -1,0 +1,28 @@
+    swagger: "2.0"
+    info:
+      title: crc-api 
+      description: "Get the visitor count."
+      version: "1.0.0"
+    host: cloudshubh.in
+    schemes:
+      - "https"
+    paths:
+      "/":
+        get:
+          description: "Get the counter"
+          operationId: "getCounter"
+          x-google-backend:
+            address:
+          parameters:
+            -
+              name: counter
+              in: query
+              required: true
+              type: string
+          responses:
+            200:
+              description: "Success."
+              schema:
+                type: string
+            400:
+              description: "unable to fetch counter ."
