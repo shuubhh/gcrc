@@ -34,8 +34,21 @@ $(document).ready(function(){
       );
   
     });
-  
 
+
+    fetch('https://apii-gateway-7e28ml3y.uc.gateway.dev')
+    .then(response => response.json())
+    .then(data => {
+        const value = data.value;
+        const visitorNumberElement = document.getElementById('visitor-number');
+        if (visitorNumberElement) {
+            // Set the text content of the element instead of innerHTML
+            visitorNumberElement.textContent = value;
+        }
+    });
+
+  
+/*
   // GET request to API
   fetch('https://apii-gateway-7e28ml3y.uc.gateway.dev')
     .then(response => response.json())
@@ -47,3 +60,4 @@ $(document).ready(function(){
   
   
   });
+  */
