@@ -11,6 +11,9 @@ terraform {
       version = "5.26.0"
     }
   }
+  backend "gcs" {
+    bucket = "civic-replica-tf-state"
+  }
 }
 
 provider "google" {

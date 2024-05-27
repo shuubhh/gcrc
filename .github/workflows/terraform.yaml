@@ -1,0 +1,49 @@
+name: Terraform Deployment
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    name: Deploy Terraform
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        project_id: civic-replica-421010
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.8.0
+
+    - name: fmt
+      run: terraform fmt -check
+      working-directory: .
+
+    - name: init
+      run: terraform init -input=false
+      working-directory: .
+
+    - name: validate
+      run: terraform validate -no-color
+
+    - name: plan
+      run: terraform plan -no-color
+      working-directory: .
+      continue-on-error: true
+
+    - name: run bash script for cloud run url + terraform apply
+      working-directory: .
+      run: |
+        chmod +x main.sh
+        ./main.sh &
+        terraform apply -auto-approve -input=false
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
