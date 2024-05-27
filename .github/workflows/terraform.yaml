@@ -50,3 +50,6 @@ jobs:
         terraform apply -auto-approve -input=false
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+    - name: check content of spec.yaml for debug
+      run: cat spec.yaml
