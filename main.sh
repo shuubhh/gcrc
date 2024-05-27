@@ -3,6 +3,8 @@
 SERVICE_NAME="tf-ko-test01"
 YAML_FILE="spec.yaml"
 
+export KO_DOCKER_REPO=asia-south1-docker.pkg.dev/civic-replica-421010/example
+
 #fetch URL of Cloud Run service
 
 get_service_url() {
