@@ -46,7 +46,7 @@ $(document).ready(function(){
             visitorNumberElement.textContent = value;
         }
     });
-
+  
   
 /*
   // GET request to API
@@ -60,4 +60,5 @@ $(document).ready(function(){
   
   
   });
-  */
+*/
+})
