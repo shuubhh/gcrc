@@ -193,11 +193,11 @@ resource "google_storage_bucket_object" "style" {
   content_type = "text/css"
 }
 
-
+/*
 resource "google_compute_global_address" "default" {
   name = "example-ip"
 }
-
+*/
 /*
 resource "google_compute_managed_ssl_certificate" "lb_default" {
   provider = google-beta
