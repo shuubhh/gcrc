@@ -3,6 +3,9 @@ name: Terraform Deployment
 on:
   workflow_dispatch: {}
 
+env:
+  KO_DOCKER_REPO: asia-south1-docker.pkg.dev/civic-replica-421010/example
+
 jobs:
   deploy:
     name: Deploy Terraform

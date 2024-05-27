@@ -149,7 +149,7 @@ resource "google_storage_bucket" "my_bucket" {
   location      = "US"
   force_destroy = true
 
-#uniform_bucket_level_access = true
+uniform_bucket_level_access = true
 
   website {
     main_page_suffix = "index.html"
@@ -163,6 +163,13 @@ resource "google_storage_bucket" "my_bucket" {
   }
 }
 
+# Make bucket public
+resource "google_storage_bucket_iam_member" "member" {
+  provider = google
+  bucket   = google_storage_bucket.my_bucket.name
+  role     = "roles/storage.objectViewer"
+  member   = "allUsers"
+}
 
 
 
