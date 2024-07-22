@@ -184,13 +184,15 @@ resource "google_storage_bucket_iam_member" "member" {
 resource "google_storage_bucket_object" "index" {
   name   = "index.html" 
   bucket = google_storage_bucket.my_bucket.name
-  source = "index.html" 
+  source = "index.html"
+  content_type = "text/html"
 }
 
 resource "google_storage_bucket_object" "script" {
   name   = "script.js"
   bucket = google_storage_bucket.my_bucket.name
   source = "script.js"
+  content_type = "text/js"
 }
 
 resource "google_storage_bucket_object" "style" {
@@ -217,8 +219,8 @@ resource "google_storage_bucket_object" "scroll" {
 resource "google_storage_bucket_object" "crdtf" {
   name   = "profile.jpg"
   bucket = google_storage_bucket.my_bucket.name
-  source = "images/creatinganddestroyingterraform.jpg"
-  content_type = "image/jpg"
+  source = "images/creatinganddestroyingterraform.jpeg"
+  content_type = "image/jpeg"
 }
 /*
 resource "google_compute_global_address" "default" {
