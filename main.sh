@@ -8,7 +8,7 @@ YAML_FILE="spec.yaml"
 #fetch URL of Cloud Run service
 
 get_service_url() {
-    URL=$(gcloud run services describe $SERVICE_NAME --region=us-central1 --format='value(status.url)')
+    URL=$(gcloud run services describe $SERVICE_NAME --region=asia-south1 --format='value(status.url)')
     if [ -n "$URL" ]; then
         echo "$URL"
     else

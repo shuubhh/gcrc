@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}
 
 env:
-  KO_DOCKER_REPO: asia-south1-docker.pkg.dev/civic-replica-421010/example
+  KO_DOCKER_REPO: asia-south1-docker.pkg.dev/${{ vars.PROJECT_ID}}/example
 
 jobs:
   deploy:
@@ -18,7 +18,7 @@ jobs:
     - name: Setup Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v0
       with:
-        project_id: civic-replica-421010
+        project_id: ${{ vars.PROJECT_ID}}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 

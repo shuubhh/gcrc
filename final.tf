@@ -12,7 +12,7 @@ terraform {
     }
   }
   backend "gcs" {
-    bucket = "civic-replica-tf-state"
+    bucket = "gcrc01tfstate"
   }
 }
 
@@ -22,15 +22,22 @@ provider "google" {
 }
 
 variable "project" {
-  default = "civic-replica-421010"
+  default = "gcrc01"
 }
 
 variable "region" {
-  default = "us-central1"
+  default = "asia-south1"
 }
 
 variable "service" {
   default = "tf-ko-test01"
+}
+
+resource "google_artifact_registry_repository" "example-repo" {
+  location      = "asia-south1"
+  repository_id = "example"
+  description   = "example repository"
+  format        = "DOCKER"
 }
 
 provider "ko" {}
@@ -193,6 +200,26 @@ resource "google_storage_bucket_object" "style" {
   content_type = "text/css"
 }
 
+resource "google_storage_bucket_object" "profile" {
+  name   = "profile.jpg"
+  bucket = google_storage_bucket.my_bucket.name
+  source = "images/profile.jpg"
+  content_type = "image/jpg"
+}
+
+resource "google_storage_bucket_object" "scroll" {
+  name   = "profile.jpg"
+  bucket = google_storage_bucket.my_bucket.name
+  source = "images/scroll-top-img.png"
+  content_type = "image/png"
+}
+
+resource "google_storage_bucket_object" "crdtf" {
+  name   = "profile.jpg"
+  bucket = google_storage_bucket.my_bucket.name
+  source = "images/creatinganddestroyingterraform.jpg"
+  content_type = "image/jpg"
+}
 /*
 resource "google_compute_global_address" "default" {
   name = "example-ip"
