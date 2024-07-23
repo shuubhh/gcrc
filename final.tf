@@ -137,7 +137,7 @@ resource "google_api_gateway_api_iam_binding" "binding" {
 resource "google_api_gateway_gateway" "gateway" {
   provider = google-beta
   api_config = google_api_gateway_api_config.openapi_config.id
-  region = var.region
+  region = "asia-northeast1"
   gateway_id = "apii-gateway"
 }
 
