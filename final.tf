@@ -210,14 +210,14 @@ resource "google_storage_bucket_object" "profile" {
 }
 
 resource "google_storage_bucket_object" "scroll" {
-  name   = "profile.jpg"
+  name   = "croll-top-img.jpg"
   bucket = google_storage_bucket.my_bucket.name
   source = "images/scroll-top-img.png"
   content_type = "image/png"
 }
 
 resource "google_storage_bucket_object" "crdtf" {
-  name   = "profile.jpg"
+  name   = "creatinganddestroyingterraform.jpeg"
   bucket = google_storage_bucket.my_bucket.name
   source = "images/creatinganddestroyingterraform.jpeg"
   content_type = "image/jpeg"
