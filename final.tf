@@ -210,7 +210,7 @@ resource "google_storage_bucket_object" "profile" {
 }
 
 resource "google_storage_bucket_object" "scroll" {
-  name   = "croll-top-img.jpg"
+  name   = "scroll-top-img.png"
   bucket = google_storage_bucket.my_bucket.name
   source = "images/scroll-top-img.png"
   content_type = "image/png"
@@ -222,6 +222,21 @@ resource "google_storage_bucket_object" "crdtf" {
   source = "images/creatinganddestroyingterraform.jpeg"
   content_type = "image/jpeg"
 }
+
+resource "google_storage_bucket_object" "crc" {
+  name   = "crc.png"
+  bucket = google_storage_bucket.my_bucket.name
+  source = "images/crc.png"
+  content_type = "image/png"
+}
+
+resource "google_storage_bucket_object" "ccp" {
+  name   = "awsccp.png"
+  bucket = google_storage_bucket.my_bucket.name
+  source = "images/aws-certified-cloud-practitioner.png"
+  content_type = "image/png"
+}
+
 /*
 resource "google_compute_global_address" "default" {
   name = "example-ip"
