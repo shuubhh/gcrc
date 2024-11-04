@@ -36,7 +36,7 @@ $(document).ready(function(){
     });
 
 
-    fetch('https://apii-gateway-a99dzw3f.an.gateway.dev/')
+    fetch('API_GATEWAY_URL')
     .then(response => response.json())
     .then(data => {
         const value = data.value;
