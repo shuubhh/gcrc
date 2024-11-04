@@ -252,7 +252,7 @@ data "google_dns_managed_zone" "gcp-cloudshubh" {
 
 resource "google_dns_record_set" "gcpsite" {
   provider = google
-  name = "website.${data.google_dns_managed_zone.gcp-cloudshubh.dns_name}"
+  name = "${data.google_dns_managed_zone.gcp-cloudshubh.dns_name}"
   type = "A"
   ttl = 300
   managed_zone = data.google_dns_managed_zone.gcp-cloudshubh.name
