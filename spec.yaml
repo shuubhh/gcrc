@@ -3,7 +3,7 @@
       title: crc-api 
       description: "Get the visitor count."
       version: "1.0.0"
-    host: cloudshubh.in
+    host: gcp.cloudshubh.in
     schemes:
       - "https"
     paths:
