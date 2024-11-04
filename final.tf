@@ -2,9 +2,11 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
+      version = "5.26.0"
     }
     ko = {
       source  = "ko-build/ko"
+      version = "0.15.1"
     }
     google-beta = {
       source = "hashicorp/google-beta"
@@ -12,7 +14,7 @@ terraform {
     }
   }
   backend "gcs" {
-    bucket = "gcrc01tfstate"
+    bucket = "crcgcp01tfstate"
   }
 }
 
@@ -22,7 +24,7 @@ provider "google" {
 }
 
 variable "project" {
-  default = "gcrc01"
+  default = "crc-gcp-01"
 }
 
 variable "region" {
@@ -30,7 +32,35 @@ variable "region" {
 }
 
 variable "service" {
-  default = "tf-ko-test01"
+  default = "tf-ko-run-service"
+}
+
+
+
+resource "google_project_service" "required_apis" {
+  for_each = toset([
+    "artifactregistry.googleapis.com",
+    "run.googleapis.com",
+    "apigateway.googleapis.com",
+    "storage.googleapis.com",
+    "dns.googleapis.com",
+    "compute.googleapis.com",
+    "certificatemanager.googleapis.com",
+    "firestore.googleapis.com",
+    "servicecontrol.googleapis.com",
+    "servicemanagement.googleapis.com",
+    "cloudapis.googleapis.com",
+  ])
+
+  project = var.project
+  service = each.value
+  disable_dependent_services = false
+  disable_on_destroy = false
+
+  timeouts {
+    create = "30m"
+    update = "40m"
+  }
 }
 
 resource "google_artifact_registry_repository" "example-repo" {
@@ -85,11 +115,6 @@ output "url" {
   value = google_cloud_run_service.default.status[0].url
 }
 
-###############################
-#provider "google" {
-#  project = var.project
-#  region  = var.region
-#}
 
 resource "google_api_gateway_api" "my_api" {
   provider = google-beta
@@ -113,26 +138,6 @@ resource "google_api_gateway_api_config" "openapi_config" {
     create_before_destroy = true
   }
 }
-/*
-resource "google_api_gateway_api_config_iam_binding" "binding" {
-  provider = google-beta
-  api = google_api_gateway_api_config.api_cfg.api
-  api_config = google_api_gateway_api_config.api_cfg.api_config_id
-  role = "roles/apigateway.viewer"
-  members = [
-    "api-go@civic-replica-421010.iam.gserviceaccount.com",
-  ]
-}
-
-resource "google_api_gateway_api_iam_binding" "binding" {
-  provider = google-beta
-  project = google_api_gateway_api.api.project
-  api = google_api_gateway_api.api.api_id
-  role = "roles/apigateway.viewer"
-  members = [
-    "api-go@civic-replica-421010.iam.gserviceaccount.com",
-  ]
-}*/
 
 resource "google_api_gateway_gateway" "gateway" {
   provider = google-beta
@@ -143,16 +148,8 @@ resource "google_api_gateway_gateway" "gateway" {
 
 #######################################################################
 
-/*
-resource "google_storage_bucket_access_control" "public_rule" {
-  bucket = google_storage_bucket.my_bucket.name
-  role   = "READER"
-  entity = "allUsers"
-}
-*/
-
 resource "google_storage_bucket" "my_bucket" {
-  name          = "cloudshubh.in"
+  name          = "gcpcloudshubh"
   location      = "US"
   force_destroy = true
 
@@ -163,7 +160,7 @@ uniform_bucket_level_access = true
    # not_found_page   = "404.html"
   }
   cors {
-    origin          = ["https://storage.googleapis.com/cloudshubh.in/"]
+    origin          = ["https://storage.googleapis.com/gcpcloudshubh/"]
     method          = ["GET", "HEAD", "PUT", "POST", "DELETE"]
     response_header = ["*"]
     max_age_seconds = 3600
@@ -171,15 +168,21 @@ uniform_bucket_level_access = true
 }
 
 # Make bucket public
-resource "google_storage_bucket_iam_member" "member" {
+resource "google_storage_bucket_iam_member" "allow_public_read" {
   provider = google
   bucket   = google_storage_bucket.my_bucket.name
   role     = "roles/storage.objectViewer"
   member   = "allUsers"
 }
 
-
-
+/*
+resource "google_storage_object_access_control" "allow_public" {
+  object = google_storage_bucket.object.index.name
+  bucket = google_storage_bucket.my_bucket.name
+  role = "READER"
+  entity = "allUsers"
+}
+*/
 
 resource "google_storage_bucket_object" "index" {
   name   = "index.html" 
@@ -237,60 +240,93 @@ resource "google_storage_bucket_object" "ccp" {
   content_type = "image/png"
 }
 
-/*
-resource "google_compute_global_address" "default" {
+
+resource "google_compute_global_address" "example_ip" {
   name = "example-ip"
 }
-*/
-/*
+
+data "google_dns_managed_zone" "gcp-cloudshubh" {
+  provider = google
+  name = "gcp-cloudshubh" 
+}
+
+resource "google_dns_record_set" "gcpsite" {
+  provider = google
+  name = "website.${data.google_dns_managed_zone.gcp-cloudshubh.dns_name}"
+  type = "A"
+  ttl = 300
+  managed_zone = data.google_dns_managed_zone.gcp-cloudshubh.name
+  rrdatas = [google_compute_global_address.example_ip.address]
+  
+}
+
+resource "google_compute_backend_bucket" "site-backend" {
+  provider = google
+  name = "site-backend"
+  description = "Contains files for website"
+  bucket_name = google_storage_bucket.my_bucket.name
+  enable_cdn = true  
+}
+
+
 resource "google_compute_managed_ssl_certificate" "lb_default" {
   provider = google-beta
   name     = "myservice-ssl-cert"
 
   managed {
-    domains = ["cloudshubh.in", "www.cloudshubh.in"]
+    domains = [google_dns_record_set.gcpsite.name]
   }
 }
+
+resource "google_compute_url_map" "default" {
+  provider = google
+  name        = "url-map"
+  description = "urlmap for site"
+  default_service = google_compute_backend_bucket.site-backend.self_link
+
+  host_rule {
+    hosts        = ["gcp.cloudshubh.in"]
+    path_matcher = "allpaths"
+  }
+/*
+  host_rule {
+    hosts = ["cloudshubh.in"]
+    path_matcher = "redirect"
+  }
+*/
+  path_matcher {
+    name            = "allpaths"
+    default_service = google_compute_backend_bucket.site-backend.self_link
+
+    path_rule {
+      paths   = ["/*"]
+      service = google_compute_backend_bucket.site-backend.self_link
+    }
+  }
+  /*
+
+  path_matcher {
+    name = "redirect"
+    default_url_redirect {
+      redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
+      https_redirect = true
+      strip_query = false
+      host_redirect = "gcp.cloudshubh.in"
+    }
+  }*/
+}
+
 
 resource "google_compute_target_https_proxy" "lb_default" {
   provider = google-beta
   name     = "myservice-https-proxy"
-  url_map  = google_compute_url_map.default.id
+  url_map  = google_compute_url_map.default.self_link
   ssl_certificates = [
-    google_compute_managed_ssl_certificate.lb_default.name
+    google_compute_managed_ssl_certificate.lb_default.self_link
   ]
   depends_on = [
     google_compute_managed_ssl_certificate.lb_default
   ]
-}
-
-# Create LB backend buckets
-resource "google_compute_backend_bucket" "my_bucket" {
-  name        = "staticsite"
-  description = "Contains docs and image"
-  bucket_name = google_storage_bucket.my_bucket.name
-}
-
-resource "google_compute_url_map" "default" {
-  name        = "url-map"
-  description = "a description"
-
-  default_service = google_compute_backend_bucket.my_bucket.id
-
-  host_rule {
-    hosts        = ["cloudshubh.in"]
-    path_matcher = "allpaths"
-  }
-
-  path_matcher {
-    name            = "allpaths"
-    default_service = google_compute_backend_bucket.my_bucket.id
-
-    path_rule {
-      paths   = ["/*"]
-      service = google_compute_backend_bucket.my_bucket.id
-    }
-  }
 }
 
 resource "google_compute_http_health_check" "default" {
@@ -301,11 +337,15 @@ resource "google_compute_http_health_check" "default" {
 }
 
 resource "google_compute_global_forwarding_rule" "default" {
+  provider = google
   name       = "forwarding-rule"
-  target     = google_compute_target_https_proxy.lb_default.id
-  port_range = 443
+  load_balancing_scheme = "EXTERNAL"
+  ip_address = google_compute_global_address.example_ip.address
+  ip_protocol = "TCP"
+  port_range = "443"
+  target     = google_compute_target_https_proxy.lb_default.self_link
 }
-*/
+
 
 resource "google_firestore_database" "database" {
   project     = var.project
@@ -313,7 +353,6 @@ resource "google_firestore_database" "database" {
   location_id = "nam5"
   type        = "FIRESTORE_NATIVE"
   point_in_time_recovery_enablement = "POINT_IN_TIME_RECOVERY_ENABLED"
-
 }
 
 resource "google_firestore_document" "mydoc" {
