@@ -42,7 +42,7 @@ func APIHandler(client *firestore.Client) http.HandlerFunc {
 
 func main() {
 	//FIRESTORE CLIENT
-	client, err := firestore.NewClient(context.Background(), "gcrc01")
+	client, err := firestore.NewClient(context.Background(), "crc-gcp-01")
 	if err != nil {
 		log.Fatalf("Failed to create Firestore client: %v", err)
 	}
