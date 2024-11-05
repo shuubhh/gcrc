@@ -346,6 +346,28 @@ resource "google_compute_global_forwarding_rule" "default" {
   target     = google_compute_target_https_proxy.lb_default.self_link
 }
 
+resource "google_compute_url_map" "http-redirect" {
+  name = "http-redirect"
+
+  default_url_redirect {
+    // "redirect_response_code" is removed
+    // redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"  // 301 redirect
+    strip_query            = false
+    https_redirect         = true  // this is the magic
+  }
+}
+
+resource "google_compute_target_http_proxy" "http-redirect" {
+  name    = "http-redirect"
+  url_map = google_compute_url_map.http-redirect.self_link
+}
+
+resource "google_compute_global_forwarding_rule" "http-redirect" {
+  name       = "http-redirect"
+  target     = google_compute_target_http_proxy.http-redirect.self_link
+  ip_address = google_compute_global_address.example_ip.address
+  port_range = "80"
+}
 
 resource "google_firestore_database" "database" {
   project     = var.project
