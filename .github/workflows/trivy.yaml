@@ -22,17 +22,17 @@ jobs:
     - name: Generate tarball from image
       run: |
         docker pull asia-south1-docker.pkg.dev/${{ vars.PROJECT_ID}}/example/api.go:latest
-        docker save -o /github/workspace/vuln-image.tar asia-south1-docker.pkg.dev/${{ vars.PROJECT_ID}}/example/api.go:latest
+        docker save -o ${GITHUB_WORKSPACE}/vuln-image.tar asia-south1-docker.pkg.dev/${{ vars.PROJECT_ID}}/example/api.go:latest
 
     - name: List workspace files
-      run: ls -la /github/workspace
+      run: ls -la ${GITHUB_WORKSPACE}
 
     - name: Inspect tarball
-      run: file /github/workspace/vuln-image.tar
+      run: file ${GITHUB_WORKSPACE}/vuln-image.tar
 
 
     - name: Run Trivy vulnerability scanner in tarball mode
       uses: aquasecurity/trivy-action@master
       with:
-        input: /github/workspace/vuln-image.tar
+        input: ${GITHUB_WORKSPACE}/vuln-image.tar
         severity: 'CRITICAL,HIGH'
