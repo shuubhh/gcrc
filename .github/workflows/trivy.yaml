@@ -12,14 +12,14 @@ jobs:
     - name: Setup Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v0
       with:
-        project_id: ${{ var.PROJECT_ID}}
+        project_id: ${{ vars.PROJECT_ID}}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
     - name: Generate tarball from image
       run: |
-        docker pull asia-south1-docker.pkg.dev/${{ var.PROJECT_ID}}/example/api.go:latest
-        docker save -o vuln-image.tar asia-south1-docker.pkg.dev/${{ var.PROJECT_ID}}/example/api.go:latest
+        docker pull asia-south1-docker.pkg.dev/${{ vars.PROJECT_ID}}/example/api.go:latest
+        docker save -o vuln-image.tar asia-south1-docker.pkg.dev/${{ vars.PROJECT_ID}}/example/api.go:latest
 
     - name: Run Trivy vulnerability scanner in tarball mode
       uses: aquasecurity/trivy-action@master
