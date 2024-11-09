@@ -157,7 +157,7 @@ uniform_bucket_level_access = true
   
 }
 
-resource "google_storage_bucket_iam_member" "allow_public_read" {
+resource "google_storage_bucket_iam_member" "allow_public_read_pr24" {
   provider = google
   bucket   = google_storage_bucket.pr24.name
   role     = "roles/storage.objectViewer"
