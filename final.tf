@@ -148,6 +148,31 @@ resource "google_api_gateway_gateway" "gateway" {
 
 #######################################################################
 
+resource "google_storage_bucket" "pr24" {
+  name = pr24
+  location = "US"
+  force_destroy = true
+  
+uniform_bucket_level_access = true
+  
+}
+
+resource "google_storage_bucket_iam_member" "allow_public_read" {
+  provider = google
+  bucket   = google_storage_bucket.pr24.name
+  role     = "roles/storage.objectViewer"
+  member   = "allUsers"
+}
+
+resource "google_storage_bucket_object" "bshubhcv" {
+  name   = "bshubhcv.pdf"
+  bucket = google_storage_bucket.pr24.name
+  source = "cv/bshubhcv.pdf"
+  content_type = "application/pdf"
+}
+
+###############################################################
+
 resource "google_storage_bucket" "my_bucket" {
   name          = "gcpcloudshubh"
   location      = "US"
@@ -205,10 +230,10 @@ resource "google_storage_bucket_object" "style" {
   content_type = "text/css"
 }
 
-resource "google_storage_bucket_object" "profile" {
-  name   = "profile.jpg"
+resource "google_storage_bucket_object" "boki" {
+  name   = "boki.jpg"
   bucket = google_storage_bucket.my_bucket.name
-  source = "images/profile.jpg"
+  source = "images/boki.jpg"
   content_type = "image/jpg"
 }
 
