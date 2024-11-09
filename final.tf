@@ -167,7 +167,7 @@ resource "google_storage_bucket_iam_member" "allow_public_read" {
 resource "google_storage_bucket_object" "bshubhcv" {
   name   = "bshubhcv.pdf"
   bucket = google_storage_bucket.pr24.name
-  source = "cv/bshubhcv.pdf"
+  source = "cv/bshubhCV.pdf"
   content_type = "application/pdf"
 }
 
