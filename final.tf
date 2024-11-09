@@ -149,7 +149,7 @@ resource "google_api_gateway_gateway" "gateway" {
 #######################################################################
 
 resource "google_storage_bucket" "pr24" {
-  name = pr24
+  name = "pr24"
   location = "US"
   force_destroy = true
   
